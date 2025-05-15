@@ -46,21 +46,36 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
         setIsDragging(false)
 
         const droppedFiles = Array.from(e.dataTransfer.files);
-
         const hasPdf = files.some(file => file.type === 'application/pdf');
 
+        const validTypes = [
+            'application/pdf',
+            'text/plain',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ];
+
+        const invalidFiles = droppedFiles.filter(file => !validTypes.includes(file.type));
+        if (invalidFiles.length > 0) {
+            toast({
+                title: 'Invalid file type',
+                description: 'Please upload only PDF, TXT, PPTX, or DOCX files',
+                variant: 'destructive',
+            });
+            return;
+        }
+
+        if (hasPdf && droppedFiles.some(file => file.type === 'application/pdf')) {
+            toast({
+                title: 'Multiple PDF files are not allowed',
+                description: 'Please select only one PDF file',
+                variant: 'destructive',
+            });
+            return;
+        }
+
         const validFiles = droppedFiles.filter(file => {
-            const validTypes = [
-                'application/pdf',
-                'image/webp',
-                'image/png',
-                'image/x-raw',
-                'image/jpeg',
-                'text/plain',
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            ];
-            return validTypes.includes(file.type) && !(hasPdf && file.type === 'application/pdf');
+            return !(hasPdf && file.type === 'application/pdf');
         });
 
         if (validFiles.length > 0) {
@@ -70,12 +85,6 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
             toast({
                 title: 'Files selected',
                 description: `${validFiles.length} file(s) have been added`,
-            })
-        } else {
-            toast({
-                title: 'Multiple PDF files are not allowed',
-                description: 'Please select only one PDF file',
-                variant: 'destructive',
             })
         }
     }
@@ -140,12 +149,12 @@ const SupportingDoc = ({ files, onFilesChange }: SupportingDocProps) => {
                         }
                     </p>
                     <p className="text-gray-400 text-sm text-center mb-4">
-                        Supports PDFs, Images (.webp, .png, .raw, .jpeg), Text files, PPTX, DOCX
+                        Supports PDFs, Text files, PPTX, DOCX
                     </p>
 
                     <input
                         type="file"
-                        accept=".pdf,.webp,.png,.raw,.jpeg,.txt,.pptx,.docx"
+                        accept=".pdf,.txt,.pptx,.docx"
                         onChange={handleFileInput}
                         className="hidden"
                         id="file-upload"

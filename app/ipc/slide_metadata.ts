@@ -1,7 +1,9 @@
 import { BrowserWindow, ipcMain } from "electron";
 import fs from 'fs';
 import path from 'path';
-import {  tempDir } from "../utils/constants";
+import { tempDir } from "../utils/constants";
+
+
 interface Position {
   left: number;
   top: number;
@@ -84,23 +86,23 @@ type SlideElement = TextElement | PictureElement | BoxElement | LineElement | Gr
 
 export function setupSlideMetadataHandlers() {
   ipcMain.handle("get-slide-metadata", async (_, url: string, theme: string, customColors?: any) => {
-    let win:BrowserWindow | null = null;
+    let win: BrowserWindow | null = null;
 
     try {
-    win = new BrowserWindow({
-      width: 1920,
-    height: 1080,
-      webPreferences: {
-        webSecurity: false,
-        preload: path.join(__dirname, '../preloads/index.js'),
-      },
-      show: false,
-    });
+      win = new BrowserWindow({
+        width: 1920,
+        height: 1080,
+        webPreferences: {
+          webSecurity: false,
+          preload: path.join(__dirname, '../preloads/index.js'),
+        },
+        show: false,
+      });
 
-    await win.loadURL(url,{userAgent:'electron'});
-     
-    
-       await win.webContents.executeJavaScript(`
+      await win.loadURL(url, { userAgent: 'electron' });
+
+
+      await win.webContents.executeJavaScript(`
         new Promise((resolve) => {
           const check = () => {
             const el = document.querySelector('[data-element-type="slide-container"]');
@@ -110,8 +112,8 @@ export function setupSlideMetadataHandlers() {
           check();
         });
       `);
-    const metadata = await win.webContents.executeJavaScript(
-`
+      const metadata = await win.webContents.executeJavaScript(
+        `
  (() => {
           const rgbToHex = (color) => {
             if (!color || color === "transparent" || color === "none") return "000000";
@@ -281,25 +283,25 @@ export function setupSlideMetadataHandlers() {
           return slidesMetadata;
         })();
 `
-    )
-        // ✅ Handle Graphs: capture each graph element as an image
+      )
+      // ✅ Handle Graphs: capture each graph element as an image
       const graphIds: { id: string; bounds: Electron.Rectangle }[] = await win.webContents.executeJavaScript(`
         (() => {
           return Array.from(document.querySelectorAll('[data-element-type="graph"]')).map(el =>  el.getAttribute("data-element-id"));
         })();
       `);
-     
-    for (const id of graphIds) {
-      try {
-        // Scroll into view first
-    await win.webContents.executeJavaScript(`
+
+      for (const id of graphIds) {
+        try {
+          // Scroll into view first
+          await win.webContents.executeJavaScript(`
     document.querySelector('[data-element-id="${id}"]').scrollIntoView({ behavior: 'instant', block: 'center' });
  
-    `); 
-        // Wait a bit for any animations/rendering to complete
-        await new Promise((r) => setTimeout(r, 2000));
-        
-        const bounds: Electron.Rectangle = await win.webContents.executeJavaScript(`
+    `);
+          // Wait a bit for any animations/rendering to complete
+          await new Promise((r) => setTimeout(r, 2000));
+
+          const bounds: Electron.Rectangle = await win.webContents.executeJavaScript(`
       (() => {
         const el = document.querySelector('[data-element-id="${id}"]');
         if (!el) return null;
@@ -313,30 +315,30 @@ export function setupSlideMetadataHandlers() {
       })();
     `);
 
-        const image = await win.webContents.capturePage(bounds);
-        const buffer = image.toJPEG(100);
-        
-        
-        if (buffer.length === 0) {
-          console.error("Empty buffer! Graph not captured.");
-          continue;
-        }
-        
-        const filePath = path.join(tempDir, `chart_${id}.jpeg`);
-        fs.writeFileSync(filePath, buffer);
-        
-        // Update metadata
-        metadata.forEach((slide: any) => {
-          slide.elements.forEach((element: any) => {
-            if ("picture" in element && element.picture.path === `__GRAPH_PLACEHOLDER__${id}`) {
-              element.picture.path = filePath;
-            }
+          const image = await win.webContents.capturePage(bounds);
+          const buffer = image.toJPEG(100);
+
+
+          if (buffer.length === 0) {
+            console.error("Empty buffer! Graph not captured.");
+            continue;
+          }
+
+          const filePath = path.join(tempDir, `chart_${id}.jpeg`);
+          fs.writeFileSync(filePath, buffer);
+
+          // Update metadata
+          metadata.forEach((slide: any) => {
+            slide.elements.forEach((element: any) => {
+              if ("picture" in element && element.picture.path === `__GRAPH_PLACEHOLDER__${id}`) {
+                element.picture.path = filePath;
+              }
+            });
           });
-        });
-      } catch (err) {
-        console.error(`Failed to capture or save chart-${id}:`, err);
+        } catch (err) {
+          console.error(`Failed to capture or save chart-${id}:`, err);
+        }
       }
-    }
       return metadata;
     } catch (error) {
       console.error("Error during page preparation:", error);
