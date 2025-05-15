@@ -1,12 +1,18 @@
-# Presenton: Open-Source, Locally-Run AI Presentation Generator (Gamma Alternative)
 
----
+<p align="center">
+  <img src="readme_assets/images/logo.png" width="240" height="100" alt="Alt text" />
+</p>
 
-**Presenton** is an open-source app that runs locally on your device, giving you full control over your presentation workflow. Generate beautiful decks using powerful AI models like OpenAI, Gemini, and others — all while keeping your data private and yourself compliant. You bring your own API keys and choose the provider to pay for only what you use. 
+# Open-Source, Locally-Run AI Presentation Generator (Gamma Alternative)
 
----
+
+**Presenton** is an open-source desktop application for generating presentations with AI — all running locally on your device. Stay in control of your data and privacy while using models like OpenAI, Gemini, and others. Just plug in your own API keys and only pay for what you use.
 
 ![Demo](readme_assets/demo.gif)
+
+## 💻📥 Download Desktop App
+[Download Link](https://presenton.ai/download)
+
 
 ## ✨ More Freedom with AI Presentations
 
@@ -41,6 +47,8 @@
 ### 7. Export presentation as PDF and PPTX
 ![Demo](readme_assets/images/export-presentation.png)
 
+## Community
+[Discord](https://discord.gg/VR89exqQ)
 
 ## License
 
