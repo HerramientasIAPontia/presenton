@@ -15,16 +15,6 @@ const config = {
   linux: {
     target: ["AppImage"],
     icon: "resources/ui/assets/images/presenton_short_filled.png",
-    files: [
-      "dependencies/chrome-headless-shell/linux_build",
-    ]
-  },
-  win: {
-    target: ["portable"],
-    icon: "resources/ui/assets/images/presenton_short_filled.png",
-    files: [
-      "dependencies/chrome-headless-shell/win_build",
-    ]
   },
 }
 
