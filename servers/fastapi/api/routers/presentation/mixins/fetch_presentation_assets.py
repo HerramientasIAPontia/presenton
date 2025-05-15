@@ -24,7 +24,10 @@ class FetchPresentationAssetsMixin:
                         image_path = os.path.join(self.temp_dir, image_name)
                         image_local_paths.append(image_path)
                     elif image_path.startswith("file://"):
-                        image_path = image_path.replace("file://", "")
+                        image_path = image_path.replace("file:///", "")
+                        # Check if it's a Windows path (has colon at index 1)
+                        if not (len(image_path) > 1 and image_path[1] == ':'):
+                            image_path = '/' + image_path
 
                     each_shape.picture.path = image_path
                     each_shape.picture.is_network = False
