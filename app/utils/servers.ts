@@ -4,6 +4,7 @@ import http from "http";
 
 // @ts-ignore
 import handler from "serve-handler";
+import path from "path";
 
 export async function startFastApiServer(
   directory: string,
@@ -13,7 +14,7 @@ export async function startFastApiServer(
 ) {
   // Start FastAPI server
   const startCommand = isDev ? [
-    ".venv/bin/python",
+    path.join(directory, ".venv/bin/python"),
     ["server_autoreload.py", "--port", port.toString()],
   ] : [
     "./fastapi", ["--port", port.toString()],
