@@ -322,7 +322,7 @@ export function setupSlideMetadataHandlers() {
           continue;
         }
         
-        const filePath = path.join(tempDir, `chart-${id}-${Date.now()}.jpeg`);
+        const filePath = path.join(tempDir, `chart_${id}.jpeg`);
         fs.writeFileSync(filePath, buffer);
         
         // Update metadata

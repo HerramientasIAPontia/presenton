@@ -12,11 +12,20 @@ const config = {
     "node_modules",
     "NOTICE",
   ],
-  linux: {
-    target: ["AppImage"],
+  win: {
+    target: ["nsis"],
     icon: "resources/ui/assets/images/presenton_short_filled.png",
   },
+  nsis: {
+    oneClick: false,
+    allowToChangeInstallationDirectory: true,
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true,
+    shortcutName: "Presenton",
+    uninstallDisplayName: "Presenton",
+    artifactName: "Presenton-Setup-${version}.${ext}",
+    deleteAppDataOnUninstall: true,
+  }
 }
-
 
 builder.build({ config })

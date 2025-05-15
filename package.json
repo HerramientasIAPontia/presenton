@@ -10,12 +10,12 @@
   },
   "scripts": {
     "dev": "rm -rf app_dist && tsc && electron .",
-    "setup:env": "npm install && cd servers/fastapi && poetry env remove --all && poetry install && .venv/bin/pip uninstall -y hf_xet && cd ../../servers/nextjs && npm install",
-    "install:pyinstaller": "cd servers/fastapi && .venv/bin/pip install pyinstaller",
+    "setup:env": "npm install && cd servers/fastapi && rm -rf .venv && virtualenv .venv && winpty .venv/Scripts/pip install -r requirements.txt && cd ../../servers/nextjs && npm install",
+    "install:pyinstaller": "cd servers/fastapi && winpty .venv/Scripts/pip install pyinstaller",
     "build:ts": "rm -rf app_dist && tsc",
     "build:css": "tailwindcss -i ./resources/ui/assets/css/tailwind.import.css -o ./resources/ui/assets/css/tailwind.css --watch",
     "build:nextjs": "rm -rf resources/nextjs && cd servers/nextjs && npm run build && cp -r out ../../resources/nextjs",
-    "build:fastapi": "rm -rf resources/fastapi && cd servers/fastapi && .venv/bin/pyinstaller --distpath ../../resources server.spec",
+    "build:fastapi": "rm -rf resources/fastapi && cd servers/fastapi && winpty .venv/Scripts/pyinstaller --distpath ../../resources server.spec",
     "build:electron": "rm -rf app_dist && tsc && node build.js",
     "build:all": "npm run clean:build && npm run setup:env && npm run build:ts && npm run install:pyinstaller && npm run build:nextjs && npm run build:fastapi && npm run build:electron",
     "clean:build": "rm -rf resources/nextjs && rm -rf resources/fastapi && rm -rf app_dist"
