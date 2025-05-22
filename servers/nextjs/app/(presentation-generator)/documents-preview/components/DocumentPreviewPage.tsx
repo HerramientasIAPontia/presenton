@@ -30,6 +30,7 @@ import { getIconFromFile, removeUUID } from "../../utils/others";
 import { ChevronRight, PanelRightOpen, X } from "lucide-react";
 import ToolTip from "@/components/ToolTip";
 import Header from "@/app/dashboard/components/Header";
+import { clearLogs, logOperation } from "../../utils/log";
 
 // Types
 interface LoadingState {
@@ -132,6 +133,7 @@ const DocumentsPreviewPage: React.FC = () => {
 
   const handleCreatePresentation = async () => {
     try {
+      logOperation('Starting document preview presentation generation');
       setShowLoading({
         message: "Generating presentation outline...",
         show: true,
@@ -146,16 +148,17 @@ const DocumentsPreviewPage: React.FC = () => {
         documents: documentPaths,
         images: imageKeys,
         language: config?.language ?? "",
-
       });
 
       try {
+        logOperation('Generating presentation titles');
         const titlePromise = await PresentationGenerationApi.titleGeneration({
           presentation_id: createResponse.id,
         });
 
         dispatch(setPresentationId(titlePromise.id));
         dispatch(setTitles(titlePromise.titles));
+        logOperation('Presentation titles generated successfully');
 
         setShowLoading({
           message: "",
@@ -166,6 +169,7 @@ const DocumentsPreviewPage: React.FC = () => {
 
         router.push("/theme");
       } catch (error) {
+        logOperation(`Error in title generation: ${error}`);
         console.error("Error in title generation:", error);
         toast({
           title: "Error in title generation.",
@@ -174,6 +178,7 @@ const DocumentsPreviewPage: React.FC = () => {
         });
       }
     } catch (error) {
+      logOperation(`Error in presentation creation: ${error}`);
       console.error("Error in presentation creation:", error);
       toast({
         title: "Error in presentation creation.",

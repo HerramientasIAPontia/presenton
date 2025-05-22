@@ -21,4 +21,6 @@ contextBridge.exposeInMainWorld('electron', {
   getTheme: (userId: string) => ipcRenderer.invoke("get-theme", userId),
   setTheme: (userId: string, themeData: any) => ipcRenderer.invoke("set-theme", userId, themeData),
   uploadImage: (file: Buffer) => ipcRenderer.invoke("upload-image", file),
+  writeNextjsLog: (logData: string) => ipcRenderer.invoke("write-nextjs-log", logData),
+  clearNextjsLogs: () => ipcRenderer.invoke("clear-nextjs-logs"),
 });

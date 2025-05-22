@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addSlide, updateSlide } from "@/store/slices/presentationGeneration";
 import NewSlide from "../../components/slide_layouts/NewSlide";
 import { getEmptySlideContent } from "../../utils/NewSlideContent";
+import { clearLogs, logOperation } from "../../utils/log";
 
 interface SlideContentProps {
   slide: Slide;
@@ -47,6 +48,7 @@ const SlideContent = ({
     ) as HTMLInputElement;
     const value = element?.value;
     if (!value?.trim()) {
+      logOperation(`Error: Empty prompt for slide ${slide.index}`);
       toast({
         title: "Error",
         description: "Please enter a prompt before submitting",
@@ -55,6 +57,7 @@ const SlideContent = ({
       return;
     }
     setIsUpdating(true);
+    logOperation(`Updating slide ${slide.index} with prompt: ${value}`);
 
     try {
       const response = await PresentationGenerationApi.editSlide(
@@ -64,7 +67,7 @@ const SlideContent = ({
       );
 
       if (response) {
-        console.log("response", response);
+        logOperation(`Slide ${slide.index} updated successfully`);
         dispatch(updateSlide({ index: slide.index, slide: response }));
         toast({
           title: "Success",
@@ -72,6 +75,7 @@ const SlideContent = ({
         });
       }
     } catch (error) {
+      logOperation(`Error updating slide ${slide.index}: ${error}`);
       console.error("Error updating slide:", error);
       toast({
         title: "Error",
@@ -84,6 +88,7 @@ const SlideContent = ({
   };
 
   const handleNewSlide = (type: number, index: number) => {
+    logOperation(`Adding new slide of type ${type} after slide ${index}`);
     const newSlide: Slide = getEmptySlideContent(
       type,
       index + 1,
@@ -101,6 +106,7 @@ const SlideContent = ({
       presentationData.slides.length > 1 &&
       isStreaming
     ) {
+
       const slideElement = document.getElementById(`slide-${index}`);
       if (slideElement) {
         slideElement.scrollIntoView({

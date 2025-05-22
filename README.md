@@ -1,6 +1,5 @@
-
 <p align="center">
-  <img src="readme_assets/images/logo.png" width="240" height="100" alt="Alt text" />
+  <img src="readme_assets/images/presenton-logo.png" height="90" alt="Presenton Logo" />
 </p>
 
 # Open-Source, Locally-Run AI Presentation Generator (Gamma Alternative)
@@ -23,6 +22,19 @@
 * ✅ **Export Ready** — Save as PowerPoint (PPTX) and PDF
 * ✅ **Fully Open-Source** — Apache 2.0 licensed
 
+## Running using source code
+
+Before following these steps make sure [Poetry](https://python-poetry.org/docs/) is installed on your system.
+
+#### 1. Clone this repository
+```git clone https://github.com/presenton/presenton.git```
+
+#### 2. Setup Electron, Python and NextJS Environments.
+```cd presenton && npm run setup:env```
+
+#### 3. Run Presenton
+```npm run dev```
+
 
 ## Features
 
@@ -35,16 +47,13 @@
 ### 3. Review and edit outline
 ![Demo](readme_assets/images/outline.png)
 
-### 4. Select theme
-![Demo](readme_assets/images/select-theme.png)
-
-### 5. Present on app
+### 4. Present on app
 ![Demo](readme_assets/images/present.png)
 
-### 6. Change theme
+### 5. Change theme
 ![Demo](readme_assets/images/change-theme.png)
 
-### 7. Export presentation as PDF and PPTX
+### 6. Export presentation as PDF and PPTX
 ![Demo](readme_assets/images/export-presentation.png)
 
 ## Community

@@ -1,11 +1,11 @@
 import { spawn } from "child_process";
-import { localhost } from "./constants";
+import { localhost, logsDir, userDataDir } from "./constants";
 import http from "http";
+import fs from "fs";
 
 // @ts-ignore
 import handler from "serve-handler";
 import path from "path";
-import { shell } from "electron";
 
 export async function startFastApiServer(
   directory: string,
@@ -34,10 +34,12 @@ export async function startFastApiServer(
     },
   );
   fastApiProcess.stdout.on("data", (data: any) => {
+    fs.appendFileSync(path.join(logsDir, "fastapi-server.log"), data);
     console.log(`FastAPI: ${data}`);
   });
   fastApiProcess.stderr.on("data", (data: any) => {
-    console.error(`FastAPI Error: ${data}`);
+    fs.appendFileSync(path.join(logsDir, "fastapi-server.log"), data);
+    console.error(`FastAPI: ${data}`);
   });
   // Wait for FastAPI server to start
   await waitForServer(`${localhost}:${port}/docs`);
@@ -66,10 +68,12 @@ export async function startNextJsServer(
       }
     );
     nextjsProcess.stdout.on("data", (data: any) => {
+      fs.appendFileSync(path.join(logsDir, "nextjs-server.log"), data);
       console.log(`NextJS: ${data}`);
     });
     nextjsProcess.stderr.on("data", (data: any) => {
-      console.error(`NextJS Error: ${data}`);
+      fs.appendFileSync(path.join(logsDir, "nextjs-server.log"), data);
+      console.error(`NextJS: ${data}`);
     });
   } else {
     // Start NextJS build server

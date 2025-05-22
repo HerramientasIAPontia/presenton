@@ -8,8 +8,8 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { ThemeType } from "../upload/type";
 import { Button } from "@/components/ui/button";
-
 import { toast } from "@/hooks/use-toast";
+import { clearLogs, logOperation } from "../utils/log";
 
 interface ThemeCardProps {
   name: string;
@@ -114,18 +114,20 @@ const ThemePage = () => {
   const router = useRouter();
   const [selectedTheme, setSelectedTheme] = useState<ThemeType | null>(null);
   const handleThemeClick = async (theme: ThemeColors, type: string) => {
+    logOperation(`Theme selected: ${type}`);
     setSelectedTheme(type as ThemeType);
   };
   const handleSubmit = () => {
     if (!selectedTheme) {
+      logOperation('Error: No theme selected');
       toast({
         title: "Please select a theme",
         variant: "destructive",
       });
       return;
     }
+    logOperation(`Proceeding with theme: ${selectedTheme}`);
     dispatch(setTheme(selectedTheme as ThemeType));
-
     router.push("/create");
   };
 

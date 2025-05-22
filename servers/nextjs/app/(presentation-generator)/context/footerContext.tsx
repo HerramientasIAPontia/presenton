@@ -5,6 +5,7 @@ import {
   FooterProperties,
   useFooterService,
 } from "../services/footerService";
+import { clearLogs, logOperation } from "../utils/log";
 
 // Default footer properties
 export const defaultFooterProperties: FooterProperties = {
@@ -57,11 +58,16 @@ export const FooterProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const loadFooterProperties = async () => {
       try {
+        logOperation('Loading footer properties');
         const properties = await footerService.getFooterProperties();
         if (properties) {
+          logOperation('Footer properties loaded successfully');
           setFooterProperties(properties);
+        } else {
+          logOperation('No footer properties found, using defaults');
         }
       } catch (error) {
+        logOperation(`Error loading footer properties: ${error}`);
         console.error("Failed to load footer properties:", error);
       }
     };
@@ -71,22 +77,32 @@ export const FooterProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const resetFooterProperties = async () => {
     try {
+      logOperation('Resetting footer properties to defaults');
       const success = await footerService.resetFooterProperties(defaultFooterProperties);
       if (success) {
+        logOperation('Footer properties reset successfully');
         setFooterProperties(defaultFooterProperties);
+      } else {
+        logOperation('Failed to reset footer properties');
       }
     } catch (error) {
+      logOperation(`Error resetting footer properties: ${error}`);
       console.error("Failed to reset footer properties:", error);
     }
   };
 
   const saveFooterProperties = async (newProperties: FooterProperties) => {
     try {
+      logOperation('Saving new footer properties');
       const success = await footerService.saveFooterProperties(newProperties);
       if (success) {
+        logOperation('Footer properties saved successfully');
         setFooterProperties(newProperties);
+      } else {
+        logOperation('Failed to save footer properties');
       }
     } catch (error) {
+      logOperation(`Error saving footer properties: ${error}`);
       console.error("Failed to save footer properties:", error);
     }
   };

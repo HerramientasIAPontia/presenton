@@ -47,6 +47,7 @@ import Modal from "./Modal";
 
 import Announcement from "@/components/Announcement";
 import { getFontLink } from "../../utils/others";
+import { clearLogs, logOperation } from "../../utils/log";
 
 const Header = ({
   presentation_id,
@@ -70,6 +71,7 @@ const Header = ({
   const handleThemeSelect = async (value: string) => {
     if (isStreaming) return;
     if (value === "custom") {
+      logOperation('Opening custom theme modal');
       setShowCustomThemeModal(true);
       return;
     } else {
@@ -78,6 +80,7 @@ const Header = ({
 
       if (themeColors) {
         try {
+          logOperation(`Changing theme to: ${themeType}`);
           // Update UI
           dispatch(setTheme(themeType));
           dispatch(setThemeColors({ ...themeColors, theme: themeType }));
@@ -111,7 +114,9 @@ const Header = ({
               ...themeColors,
             },
           });
+          logOperation(`Theme ${themeType} applied successfully`);
         } catch (error) {
+          logOperation(`Error updating theme: ${error}`);
           console.error("Failed to update theme:", error);
           toast({
             title: "Error updating theme",
@@ -126,8 +131,7 @@ const Header = ({
 
   const getSlideMetadata = async () => {
     try {
-      // Get the current URL without any query parameters
-      // const baseUrl = `${window.location.origin}/pdf-maker?id=${presentation_id}`;
+      logOperation('Fetching slide metadata');
       const baseUrl = window.location.href;
       // @ts-ignore
       const metadata = await window.electron.getSlideMetadata(
@@ -135,10 +139,10 @@ const Header = ({
         currentTheme,
         currentColors,
       );
-
-      console.log("metadata", metadata);
+      logOperation('Slide metadata fetched successfully');
       return metadata;
     } catch (error) {
+      logOperation(`Error fetching metadata: ${error}`);
       setShowLoader(false);
       console.error("Error fetching metadata:", error);
       toast({
@@ -183,23 +187,27 @@ const Header = ({
     if (isStreaming) return;
 
     try {
+      logOperation('Starting PPTX export');
       setOpen(false);
       setShowLoader(true);
 
       const apiBody = await metaData();
-
       const response = await PresentationGenerationApi.exportAsPPTX(apiBody);
+
       if (response.path) {
+        logOperation('PPTX export completed, initiating download');
         setShowLoader(false);
         // @ts-ignore
         const ipcResponse = await window.electron.fileDownloaded(response.path);
         if (!ipcResponse.success) {
           throw new Error("Failed to download file");
         }
+        logOperation('PPTX download completed successfully');
       } else {
         throw new Error("No URL returned from export");
       }
     } catch (error) {
+      logOperation(`Error in PPTX export: ${error}`);
       console.error("Export failed:", error);
       setShowLoader(false);
       toast({
@@ -218,6 +226,7 @@ const Header = ({
 
     setOpen(false);
     try {
+      logOperation('Starting PDF export');
       toast({
         title: "Exporting presentation...",
         description: "Please wait while we export your presentation.",
@@ -229,8 +238,10 @@ const Header = ({
       if (!ipcResponse.success) {
         throw new Error("Failed to export as PDF");
       }
+      logOperation('PDF export completed successfully');
 
     } catch (err) {
+      logOperation(`Error in PDF export: ${err}`);
       console.error(err);
       toast({
         title: "Having trouble exporting!",

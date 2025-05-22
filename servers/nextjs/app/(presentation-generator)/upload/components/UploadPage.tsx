@@ -30,6 +30,7 @@ import { PresentationGenerationApi } from "../../services/api/presentation-gener
 import { OverlayLoader } from "@/components/ui/overlay-loader";
 import Wrapper from "@/components/Wrapper";
 import { setPptGenUploadState } from "@/store/slices/presentationGenUpload";
+import { clearLogs, logOperation } from "../../utils/log";
 
 // Types for loading state
 interface LoadingState {
@@ -62,6 +63,8 @@ const UploadPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { toast } = useToast();
+
+
 
   // State management
   const [documents, setDocuments] = useState<File[]>([]);
@@ -138,7 +141,15 @@ const UploadPage = () => {
     if (!validateConfiguration()) return;
 
     try {
+      // Clear previous logs before starting new presentation
+      clearLogs();
+      logOperation(`----New Presentation Generation----`);
+
       const hasUploadedAssets = documents.length > 0 || images.length > 0;
+      // Log the configuration
+      logOperation(`Config: ${JSON.stringify(config)}`);
+      // Log the files updated
+      logOperation(`Files updated: ${documents.length} documents, ${images.length} images`);
 
       if (hasUploadedAssets) {
         await handleDocumentProcessing();
@@ -154,6 +165,7 @@ const UploadPage = () => {
    * Handles  document processing
    */
   const handleDocumentProcessing = async () => {
+    logOperation('Starting document processing');
     setLoadingState({
       isLoading: true,
       message: "Processing documents...",
@@ -166,6 +178,7 @@ const UploadPage = () => {
     let imageKeys = [];
 
     if (documents.length > 0 || images.length > 0) {
+      logOperation(`Uploading ${documents.length} documents and ${images.length} images`);
       const uploadResponse = await PresentationGenerationApi.uploadDoc(documents, images);
       documentKeys = uploadResponse["documents"];
       imageKeys = uploadResponse["images"];
@@ -174,15 +187,16 @@ const UploadPage = () => {
     const promises: Promise<any>[] = [];
 
     if (documents.length > 0 || images.length > 0) {
+      logOperation('Decomposing documents');
       promises.push(
         PresentationGenerationApi.decomposeDocuments(documentKeys, imageKeys)
       );
     }
 
     const responses = await Promise.all(promises);
-
     const processedData = processApiResponses(responses);
 
+    logOperation('Document processing completed');
     dispatch(setPptGenUploadState(processedData));
     router.push("/documents-preview");
   };
@@ -217,6 +231,7 @@ const UploadPage = () => {
    * Handles direct presentation generation without documents
    */
   const handleDirectPresentationGeneration = async () => {
+    logOperation('Starting direct presentation generation');
     setLoadingState({
       isLoading: true,
       message: "Generating outlines...",
@@ -229,20 +244,21 @@ const UploadPage = () => {
       n_slides: config?.slides ? parseInt(config.slides) : null,
       documents: [],
       images: [],
-
       language: config?.language ?? "",
-
     });
 
     try {
+      logOperation('Generating presentation titles');
       const titlePromise = await PresentationGenerationApi.titleGeneration({
         presentation_id: createResponse.id,
       });
       dispatch(setPresentationId(titlePromise.id));
       dispatch(setTitles(titlePromise.titles));
+      logOperation('Presentation generation completed successfully');
       router.push("/theme");
     } catch (error) {
       console.error("Error in title generation:", error);
+      logOperation(`Error in title generation: ${error}`);
       toast({
         title: "Error in title generation.",
         description: "Please try again.",
@@ -256,6 +272,7 @@ const UploadPage = () => {
    */
   const handleGenerationError = (error: any) => {
     console.error("Error in presentation generation:", error);
+    logOperation(`Presentation generation error: ${error}`);
     dispatch(setError("Failed to generate presentation"));
     setLoadingState({
       isLoading: false,

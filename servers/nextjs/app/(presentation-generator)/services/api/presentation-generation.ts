@@ -1,6 +1,7 @@
 import {  getEnv } from "@/utils/constant";
 import { getHeader, getHeaderForFormData } from "./header";
 import { IconSearch, ImageGenerate, ImageSearch } from "./params";
+import { clearLogs, logOperation } from "../../utils/log";
 
 const urls = getEnv();
 const BASE_URL = urls.BASE_URL;
@@ -11,6 +12,7 @@ export class PresentationGenerationApi {
 
   static async getChapterDetails() {
     try {
+      logOperation('Fetching chapter details');
       const response = await fetch(
         `${BASE_URL}/ppt/chapter-details`,
         {
@@ -21,15 +23,18 @@ export class PresentationGenerationApi {
       );
       if (response.status === 200) {
         const data = await response.json();
+        logOperation('Successfully fetched chapter details');
         return data;
       }
     } catch (error) {
+      logOperation(`Error fetching chapter details: ${error}`);
       console.error("Error getting chapter details:", error);
       throw error;
     }
   }
 
   static async uploadDoc(documents: File[], images: File[]) {
+    logOperation(`Uploading documents: ${documents.length} files, images: ${images.length} files`);
     const formData = new FormData();
 
     documents.forEach((document) => {
@@ -53,12 +58,15 @@ export class PresentationGenerationApi {
       );
 
       if (!response.ok) {
+        logOperation(`Upload failed with status: ${response.status}`);
         throw new Error(`Upload failed: ${response.statusText}`);
       }
 
       const data = await response.json();
+      logOperation('Successfully uploaded documents and images');
       return data;
     } catch (error) {
+      logOperation(`Upload error: ${error}`);
       console.error("Upload error:", error);
       throw error;
     }
@@ -67,6 +75,7 @@ export class PresentationGenerationApi {
  
 
   static async decomposeDocuments(documentKeys: string[], imageKeys: string[]) {
+    logOperation(`Decomposing documents: ${documentKeys.length} files, images: ${imageKeys.length} files`);
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/files/decompose`,
@@ -82,12 +91,14 @@ export class PresentationGenerationApi {
       );
       if (response.status === 200) {
         const data = await response.json();
-
+        logOperation('Successfully decomposed documents');
         return data;
       } else {
+        logOperation(`Failed to decompose files: ${response.statusText}`);
         throw new Error(`Failed to decompose files: ${response.statusText}`);
       }
     } catch (error) {
+      logOperation(`Error in Decompose Files: ${error}`);
       console.error("Error in Decompose Files", error);
       throw error;
     }
@@ -124,6 +135,7 @@ export class PresentationGenerationApi {
   }
 
   static async generatePresentation(presentationData: any) {
+    logOperation('Generating presentation');
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/generate`,
@@ -136,14 +148,14 @@ export class PresentationGenerationApi {
       );
       if (response.status === 200) {
         const data = await response.json();
-
+        logOperation('Successfully generated presentation');
         return data;
       } else {
-        throw new Error(
-          `Failed to generate presentation: ${response.statusText}`
-        );
+        logOperation(`Failed to generate presentation: ${response.statusText}`);
+        throw new Error(`Failed to generate presentation: ${response.statusText}`);
       }
     } catch (error) {
+      logOperation(`Error in presentation generation: ${error}`);
       console.error("error in presentation generation", error);
       throw error;
     }
@@ -153,6 +165,7 @@ export class PresentationGenerationApi {
     index: number,
     prompt: string
   ) {
+    logOperation(`Editing slide ${index} in presentation ${presentation_id}`);
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/edit`,
@@ -170,12 +183,15 @@ export class PresentationGenerationApi {
       );
 
       if (!response.ok) {
+        logOperation(`Failed to update slide ${index}: ${response.statusText}`);
         throw new Error("Failed to update slides");
       }
 
       const data = await response.json();
+      logOperation(`Successfully updated slide ${index}`);
       return data;
     } catch (error) {
+      logOperation(`Error in slide update: ${error}`);
       console.error("error in slide update", error);
       throw error;
     }
@@ -254,6 +270,7 @@ export class PresentationGenerationApi {
     }
   }
   static async generateImage(imageGenerate: ImageGenerate) {
+    logOperation(`Generating image with prompt: ${imageGenerate.prompt.image_prompt}`);
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/image/generate`,
@@ -266,12 +283,14 @@ export class PresentationGenerationApi {
       );
       if (response.ok) {
         const data = await response.json();
-
+        logOperation('Successfully generated image');
         return data;
       } else {
+        logOperation(`Failed to generate images: ${response.statusText}`);
         throw new Error(`Failed to generate images: ${response.statusText}`);
       }
     } catch (error) {
+      logOperation(`Error in image generation: ${error}`);
       console.error("error in image generation", error);
       throw error;
     }
@@ -325,6 +344,7 @@ export class PresentationGenerationApi {
 
   // EXPORT PRESENTATION
   static async exportAsPPTX(presentationData: any) {
+    logOperation('Exporting presentation as PPTX');
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/presentation/export_as_pptx`,
@@ -337,20 +357,23 @@ export class PresentationGenerationApi {
       );
       if (response.ok) {
         const data = await response.json();
-
+        logOperation('Successfully exported presentation as PPTX');
         return {
           ...data,
           url: `${BASE_URL}${data.url}`,
         };
       } else {
+        logOperation(`Failed to export as pptx: ${response.statusText}`);
         throw new Error(`Failed to export as pptx: ${response.statusText}`);
       }
     } catch (error) {
+      logOperation(`Error in pptx export: ${error}`);
       console.error("error in pptx export", error);
       throw error;
     }
   }
   static async exportAsPDF(presentationData: any) {
+    logOperation('Exporting presentation as PDF');
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/presentation/export_as_pdf`,
@@ -362,17 +385,20 @@ export class PresentationGenerationApi {
       );
       if (response.ok) {
         const data = await response.json();
-
+        logOperation('Successfully exported presentation as PDF');
         return data;
       } else {
+        logOperation(`Failed to export as pdf: ${response.statusText}`);
         throw new Error(`Failed to export as pdf: ${response.statusText}`);
       }
     } catch (error) {
+      logOperation(`Error in pdf export: ${error}`);
       console.error("error in pdf export", error);
       throw error;
     }
   }
   static async deleteSlide(presentation_id: string, slide_id: string) {
+    logOperation(`Deleting slide ${slide_id} from presentation ${presentation_id}`);
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/slide/delete?presentation_id=${presentation_id}&slide_id=${slide_id}`,
@@ -383,17 +409,21 @@ export class PresentationGenerationApi {
         }
       );
       if (response.status === 204) {
+        logOperation(`Successfully deleted slide ${slide_id}`);
         return true;
       } else {
+        logOperation(`Failed to delete slide: ${response.statusText}`);
         throw new Error(`Failed to delete slide: ${response.statusText}`);
       }
     } catch (error) {
+      logOperation(`Error in slide deletion: ${error}`);
       console.error("error in slide deletion", error);
       throw error;
     }
   }
   // SET THEME COLORS
   static async setThemeColors(presentation_id: string, theme: any) {
+    logOperation(`Setting theme colors for presentation ${presentation_id}`);
     try {
       const response = await fetch(
         `${BASE_URL}/ppt/presentation/theme`,

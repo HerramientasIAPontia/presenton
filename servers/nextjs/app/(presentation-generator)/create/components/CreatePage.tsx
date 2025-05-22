@@ -27,6 +27,7 @@ import {
 } from "@/store/slices/presentationGeneration";
 import { OverlayLoader } from "@/components/ui/overlay-loader";
 import Wrapper from "@/components/Wrapper";
+import { clearLogs, logOperation } from "../../utils/log";
 
 const CreatePage = () => {
   const dispatch = useDispatch();
@@ -71,11 +72,10 @@ const CreatePage = () => {
     if (!active || !over || !titles) return;
 
     if (active.id !== over.id) {
+      logOperation(`Reordering slides: ${active.id} -> ${over.id}`);
       // Find the indices of the dragged and target items
       const oldIndex = titles.findIndex((item) => item === active.id);
       const newIndex = titles.findIndex((item) => item === over.id);
-
-      // Create new array with reordered items and updated indices
 
       // Reorder the array
       const reorderedArray = arrayMove(titles, oldIndex, newIndex);
@@ -86,6 +86,7 @@ const CreatePage = () => {
   };
 
   const handleSubmit = async () => {
+    logOperation('Starting presentation generation');
     // Generate data
     setLoadingState({
       message: "Generating data...",
@@ -94,8 +95,6 @@ const CreatePage = () => {
       duration: 10,
     });
     try {
-
-
       const response = await PresentationGenerationApi.generateData({
         presentation_id: presentation_id,
         theme: {
@@ -105,17 +104,17 @@ const CreatePage = () => {
         watermark: false,
         images: images,
         titles: titles,
-
       });
 
       if (response) {
+        logOperation('Presentation data generated successfully');
         dispatch(setPresentationData(response));
-
         router.push(
           `/presentation?id=${presentation_id}&session=${response.session}`
         );
       }
     } catch (error) {
+      logOperation(`Error in presentation generation: ${error}`);
       console.error("error in data generation", error);
       toast({
         title: "Error Adding Charts",
@@ -134,6 +133,7 @@ const CreatePage = () => {
 
   const handleAddSlide = () => {
     if (!titles) {
+      logOperation('Error: Cannot add slide - titles not available');
       toast({
         title: "Error",
         description: "Cannot add slide at this time",
@@ -143,6 +143,7 @@ const CreatePage = () => {
     }
 
     if (titles.length >= initialSlideCount) {
+      logOperation('Error: Cannot add more slides - reached maximum limit');
       toast({
         title: "Cannot add more slides",
         description:
@@ -152,8 +153,8 @@ const CreatePage = () => {
       return;
     }
 
+    logOperation('Adding new slide to presentation');
     const newTitleWithCharts = [...titles, "New Slide"];
-
     dispatch(setTitles(newTitleWithCharts));
   };
 
