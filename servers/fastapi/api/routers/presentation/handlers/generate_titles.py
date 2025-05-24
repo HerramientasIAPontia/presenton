@@ -21,7 +21,6 @@ class PresentationTitlesGenerateHandler:
         temp_file_service.cleanup_temp_dir(self.temp_dir)
 
     async def post(self, logging_service: LoggingService, log_metadata: LogMetadata):
-
         logging_service.logger.info(
             logging_service.message(self.data.model_dump(mode="json")),
             extra=log_metadata.model_dump(),
@@ -39,8 +38,9 @@ class PresentationTitlesGenerateHandler:
                 presentation.language,
             )
 
+            # Convert Pydantic models to dictionaries
             presentation.title = presentation_titles.presentation_title
-            presentation.titles = presentation_titles.titles
+            presentation.titles = [title.model_dump(mode="json") for title in presentation_titles.titles]
 
             sql_session.commit()
             sql_session.refresh(presentation)

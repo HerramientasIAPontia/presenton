@@ -4,10 +4,13 @@ from typing import Optional, Union
 
 
 class TempFileService:
-    base_dir = os.getenv("TEMP_DIRECTORY")
-
     def __init__(self):
-        self.cleanup_base_dir()
+        self.base_dir = os.getenv("TEMP_DIRECTORY")
+        if not self.base_dir:
+            self.base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "temp")
+        
+        if os.path.exists(self.base_dir):
+            self.cleanup_base_dir()
         os.makedirs(self.base_dir, exist_ok=True)
 
     def create_dir_in_dir(self, base_dir: str, dir_name: Optional[str] = None) -> str:

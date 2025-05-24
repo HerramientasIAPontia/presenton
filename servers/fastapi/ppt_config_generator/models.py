@@ -16,11 +16,13 @@ class TitleWithGraphIdCollectionModel(BaseModel):
     items: List[TitleWithGraphIdModel]
 
 
+class TitleContentModel(BaseModel):
+    title: str = Field(description="Title of slide in about 2 to 4 words")
+    content: List[str] = Field(description="Content of the slide in about 3 to 8 sentences. It should be the actual content of the slide not the direction.")
+
 class PresentationTitlesModel(BaseModel):
-    presentation_title: str = Field("Title of this presentation in about 3 to 8 words")
-    titles: List[str] = Field(
-        description="List of title of every slide in presentation in about 2 to 8 words"
-    )
+    presentation_title: str = Field("Title of this presentation in about 2 to words")
+    titles: List[TitleContentModel] = Field(description="List of title and its content in a slide")
     # content: Optional[str] = Field(
     #     default=None,
     #     description="In-depth content extracted from prompt, images and documents in about 500 words in Markdown format",
