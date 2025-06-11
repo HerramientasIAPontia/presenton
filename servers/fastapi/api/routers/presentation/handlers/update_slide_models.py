@@ -51,15 +51,15 @@ class UpdateSlideModelsHandler:
         for new_slide in new_slides:
             new_images = new_slide.images or []
 
-            for i, asset in enumerate(new_images):
-                if asset.startswith("http"):
-                    parsed_url = unquote(urlparse(asset).path)
+            for i, image in enumerate(new_images):
+                if image.startswith("http"):
+                    parsed_url = unquote(urlparse(image).path)
                     image_name = replace_file_name(
                         os.path.basename(parsed_url), str(uuid.uuid4())
                     )
                     image_path = os.path.join(images_dir, image_name)
                     images_local_paths.append(image_path)
-                    images_download_links.append(asset)
+                    images_download_links.append(image)
                     getattr(new_slide, "images")[i] = image_path
 
         if images_download_links:

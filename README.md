@@ -22,12 +22,33 @@
 * ✅ **Export Ready** — Save as PowerPoint (PPTX) and PDF
 * ✅ **Fully Open-Source** — Apache 2.0 licensed
 
-## Running using source code
+## Running Presenton Docker
+
+#### 1. Start Presenton
+
+##### Linux/MacOS (Bash/Zsh Shell):
+```bash
+docker run -it --name presenton -p 5000:80 -v "./user_data:/app/user_data" ghcr.io/presenton/presenton:latest
+```
+
+##### Windows (PowerShell):
+```bash
+docker run -it --name presenton -p 5000:80 -v "${PWD}\user_data:/app/user_data" ghcr.io/presenton/presenton:latest
+```
+
+#### 2. Open Presenton
+Open http://localhost:5000 on browser of your choice to use Presenton.
+
+> **Note: You can replace 5000 with any other port number of your choice to run Presenton on a different port number.**
+
+## Running electron app using source code
 
 Before following these steps make sure [Poetry](https://python-poetry.org/docs/) is installed on your system.
 
 #### 1. Clone this repository
 ```git clone https://github.com/presenton/presenton.git```
+
+> Note: Switch to **windows_build** branch to run Presenton on Windows
 
 #### 2. Setup Electron, Python and NextJS Environments.
 ```cd presenton && npm run setup:env```
