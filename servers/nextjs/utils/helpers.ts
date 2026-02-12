@@ -138,3 +138,7 @@ export const getMaxLimits = (tier: 'free' | 'standard' | 'premium') => {
 
   return limits[tier];
 };
+
+export const reverseSentenceWords = (sentence: string): string => {
+  return sentence.trim().split(/\s+/).reverse().join(' ');
+};
