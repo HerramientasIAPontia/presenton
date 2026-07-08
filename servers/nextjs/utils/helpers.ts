@@ -16,6 +16,13 @@ export const getURL = (path: string = '') => {
 };
 
 
+
+export const reverseSentenceWords = (sentence: string): string => {
+  const words = sentence.trim().split(/\s+/).filter(Boolean);
+
+  return words.reverse().join(' ');
+};
+
 export const toDateTime = (secs: number) => {
   var t = new Date('1970-01-01T00:30:00Z');
   t.setSeconds(secs);
