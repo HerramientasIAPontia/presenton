@@ -17,10 +17,18 @@ export const getURL = (path: string = '') => {
 
 
 
-export const reverseSentenceWords = (sentence: string): string => {
-  const words = sentence.trim().split(/\s+/).filter(Boolean);
+export const reverseSentenceWords = (sentence: string | null | undefined): string => {
+  if (typeof sentence !== 'string') {
+    throw new TypeError('reverseSentenceWords expects a string.');
+  }
 
-  return words.reverse().join(' ');
+  const normalizedSentence = sentence.trim();
+
+  if (!normalizedSentence) {
+    return '';
+  }
+
+  return normalizedSentence.split(/\s+/).reverse().join(' ');
 };
 
 export const toDateTime = (secs: number) => {
