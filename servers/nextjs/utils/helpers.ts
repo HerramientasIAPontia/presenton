@@ -16,6 +16,21 @@ export const getURL = (path: string = '') => {
 };
 
 
+
+export const reverseSentenceWords = (sentence: string | null | undefined): string => {
+  if (typeof sentence !== 'string') {
+    throw new TypeError('reverseSentenceWords expects a string.');
+  }
+
+  const normalizedSentence = sentence.trim();
+
+  if (!normalizedSentence) {
+    return '';
+  }
+
+  return normalizedSentence.split(/\s+/).reverse().join(' ');
+};
+
 export const toDateTime = (secs: number) => {
   var t = new Date('1970-01-01T00:30:00Z');
   t.setSeconds(secs);
