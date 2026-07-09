@@ -67,3 +67,7 @@ export function formatLargeNumber(num: number): string {
   }
   return num.toString();
 }
+
+export function reverseWordsInSentence(sentence: string): string {
+  return sentence.trim().split(/\s+/).reverse().join(' ');
+}
